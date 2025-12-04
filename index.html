@@ -3,34 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fichada Personal</title>
+    <title>Acceso Fichada</title>
+    <!-- Fuente Poppins para coincidir con la App -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
     <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
         body, html { 
             margin: 0; padding: 0; height: 100%; 
-            overflow: hidden; 
-            background-color: #f0f2f5; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden;
+            /* Fondo degradado animado igual que la App */
+            background: linear-gradient(135deg, #021b36, #003b5b, #046faa);
+            background-size: 300% 300%;
+            animation: gradientShift 10s ease infinite;
         }
-        iframe {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; border: none;
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
+        
+        /* --- TARJETA DE SELECCIÓN --- */
+        #selector-screen {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 { 
+            margin: 0 0 5px 0; 
+            color: #003b5b; 
+            font-size: 1.5em; 
+            font-weight: 600; 
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+        
+        .instruction-text {
+            color: #555;
+            font-size: 12px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            line-height: 1.4;
+        }
+
+        .btn-account {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 12px;
+            background: #046faa; /* Azul corporativo */
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(4,111,170,0.3);
+            position: relative;
+        }
+        
+        .btn-account:hover { 
+            transform: translateY(-2px);
+            background: #035a8a;
+        }
+        
+        .btn-account:active { 
+            transform: scale(0.98); 
+        }
+
+        /* --- CONTENEDOR DE LA APP (IFRAME) --- */
+        #app-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; /* Oculto al inicio */
+            background: white;
+            z-index: 10;
+        }
+        
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* Botón flotante para volver atrás */
+        #btn-back {
+            position: fixed; bottom: 20px; right: 20px;
+            background: rgba(2, 27, 54, 0.8); 
+            color: white;
+            border: none; border-radius: 50%; width: 50px; height: 50px;
+            font-size: 24px; cursor: pointer; z-index: 30;
+            display: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        #btn-back:active { transform: scale(0.9); }
+
+        /* Spinner simple */
+        .spinner {
+            display: inline-block; width: 12px; height: 12px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
+            border-top-color: white; animation: spin 1s ease-in-out infinite;
+            margin-left: 10px; display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
-    <!-- ESTRATEGIA "ESPEJO DIRECTO" para GitHub -->
-    <iframe 
-        id="appFrame"
-        src="" 
-        allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; fullscreen *"
-        title="App Fichada">
-    </iframe>
+
+    <!-- PANTALLA 1: SELECCIÓN -->
+    <div id="selector-screen">
+        <div style="font-size: 40px; margin-bottom: 10px;">📍</div>
+        <h2>Bienvenido</h2>
+        <div class="subtitle">LC. Service Oil & Gas</div>
+        
+        <button class="btn-account" onclick="cargarConCuenta(0, this)">
+            Opción 1 <span class="spinner"></span>
+        </button>
+        <button class="btn-account" onclick="cargarConCuenta(1, this)">
+            Opción 2 <span class="spinner"></span>
+        </button>
+        <button class="btn-account" onclick="cargarConCuenta(2, this)">
+            Opción 3 <span class="spinner"></span>
+        </button>
+        
+        <p class="instruction-text">
+            En caso de no poder ingresar en una de esas opciones, intente ingresar por las otras.
+        </p>
+    </div>
+
+    <!-- PANTALLA 2: APP -->
+    <div id="app-wrapper">
+        <iframe 
+            id="main-frame"
+            src="" 
+            allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; fullscreen *"
+            title="App Fichada">
+        </iframe>
+    </div>
+
+    <!-- Botón volver -->
+    <button id="btn-back" onclick="resetear()">↺</button>
 
     <script>
-        // PEGA AQUÍ TU ENLACE DE APPS SCRIPT (/exec)
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbzfACA37EawNLAuOGGtHd2R0Uki-Z1ze-AURg18yrU-m9uDBU_blGR67CoiCsUseeE/exec";
-        
-        const cacheBuster = new Date().getTime();
-        document.getElementById('appFrame').src = webAppUrl + "?v=" + cacheBuster;
+        // ENLACE ACTUALIZADO
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbzfACA37EawNLAuOGGtHd2R0Uki-Z1ze-AURg18yrU-m9uDBU_blGR67CoiCsUseeE/exec";
+
+        function cargarConCuenta(authIndex, btnElement) {
+            // Mostrar carga visual
+            const spinner = btnElement.querySelector('.spinner');
+            if(spinner) spinner.style.display = 'inline-block';
+
+            setTimeout(() => {
+                // Ocultar selector / Mostrar iframe
+                document.getElementById('selector-screen').style.display = 'none';
+                document.getElementById('app-wrapper').style.display = 'block';
+                document.getElementById('btn-back').style.display = 'block';
+
+                // Construir URL forzando el usuario (0, 1 o 2) + Anti-Caché
+                const cacheBuster = new Date().getTime();
+                const finalUrl = scriptUrl + "?authuser=" + authIndex + "&v=" + cacheBuster;
+
+                // Cargar
+                document.getElementById('main-frame').src = finalUrl;
+                
+                // Resetear spinner
+                if(spinner) spinner.style.display = 'none';
+            }, 300);
+        }
+
+        function resetear() {
+            // Volver al inicio
+            document.getElementById('main-frame').src = "";
+            document.getElementById('app-wrapper').style.display = 'none';
+            document.getElementById('btn-back').style.display = 'none';
+            document.getElementById('selector-screen').style.display = 'block';
+        }
     </script>
 </body>
 </html>
