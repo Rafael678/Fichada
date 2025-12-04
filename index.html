@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fichada Personal</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            overflow: hidden; 
+            background-color: #f0f2f5; 
+        }
+        iframe {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- ESTRATEGIA "ESPEJO DIRECTO" para GitHub -->
+    <iframe 
+        id="appFrame"
+        src="" 
+        allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; fullscreen *"
+        title="App Fichada">
+    </iframe>
+
+    <script>
+        // PEGA AQUÍ TU ENLACE DE APPS SCRIPT (/exec)
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzfACA37EawNLAuOGGtHd2R0Uki-Z1ze-AURg18yrU-m9uDBU_blGR67CoiCsUseeE/exec";
+        
+        const cacheBuster = new Date().getTime();
+        document.getElementById('appFrame').src = webAppUrl + "?v=" + cacheBuster;
+    </script>
+</body>
+</html>
