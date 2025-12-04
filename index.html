@@ -97,9 +97,9 @@
         
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Botón flotante para volver atrás */
+        /* Botón flotante para volver atrás (Izquierda) */
         #btn-back {
-            position: fixed; bottom: 20px; right: 20px;
+            position: fixed; bottom: 20px; left: 20px;
             background: rgba(2, 27, 54, 0.8); 
             color: white;
             border: none; border-radius: 50%; width: 50px; height: 50px;
@@ -109,6 +109,18 @@
             transition: transform 0.2s;
         }
         #btn-back:active { transform: scale(0.9); }
+
+        /* Botón flotante de AYUDA (Derecha) - NUEVO */
+        #btn-help {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #d32f2f; 
+            color: white;
+            border: none; border-radius: 50%; width: 50px; height: 50px;
+            font-size: 24px; cursor: pointer; z-index: 30;
+            display: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
 
         /* Spinner simple */
         .spinner {
@@ -124,7 +136,7 @@
         #rescue-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.98); /* Fondo blanco casi sólido */
-            z-index: 25;
+            z-index: 40; /* Por encima de todo */
             display: none; /* Oculto por defecto */
             flex-direction: column; align-items: center; justify-content: center;
             text-align: center; padding: 20px;
@@ -178,20 +190,20 @@
 
     <!-- PANTALLA DE RESCATE (Para móviles cuando se tilda) -->
     <div id="rescue-screen">
-        <h3 style="color:#003b5b; margin-bottom:10px;">Problemas de conexión</h3>
+        <h3 style="color:#003b5b; margin-bottom:10px;">¿Problemas de acceso?</h3>
         <p style="color:#666; font-size:14px; line-height:1.5;">
-            El navegador ha bloqueado la carga de la cuenta.<br>
-            Use el selector oficial para continuar.
+            Si la pantalla está en blanco o con error,<br>use el selector oficial de Google.
         </p>
         <a id="rescue-link" href="#" target="_blank" class="btn-rescue">
             🚀 ELEGIR CUENTA EN GOOGLE
         </a>
         <br><br>
-        <button onclick="cerrarRescate()" style="background:none; border:none; color:#666; text-decoration:underline; cursor:pointer; font-size:14px;">Cancelar y volver</button>
+        <button onclick="cerrarRescate()" style="background:none; border:none; color:#666; text-decoration:underline; cursor:pointer; font-size:14px;">Cancelar (Ya cargó bien)</button>
     </div>
 
-    <!-- Botón volver -->
+    <!-- Botones flotantes -->
     <button id="btn-back" onclick="resetear()">↺</button>
+    <button id="btn-help" onclick="abrirRescateManual()">?</button>
 
     <script>
         // ENLACE ACTUALIZADO
@@ -208,6 +220,7 @@
                 document.getElementById('selector-screen').style.display = 'none';
                 document.getElementById('app-wrapper').style.display = 'block';
                 document.getElementById('btn-back').style.display = 'block';
+                document.getElementById('btn-help').style.display = 'block';
 
                 // Construir URL forzando el usuario (0, 1 o 2) + Anti-Caché
                 const cacheBuster = new Date().getTime();
@@ -224,16 +237,12 @@
                 const iframe = document.getElementById('main-frame');
                 iframe.src = finalUrl;
                 
-                // --- DETECTOR DE CONGELAMIENTO ---
-                // Si en 4 segundos el iframe no avisa que cargó, mostramos la ayuda.
+                // --- DETECTOR DE CONGELAMIENTO MEJORADO ---
+                // No cancelamos el timer con onload porque a veces onload dispara el error.
+                // Mostramos la ayuda a los 5 segundos SIEMPRE. Si cargó bien, el usuario la cierra.
                 loadTimer = setTimeout(() => {
                     document.getElementById('rescue-screen').style.display = 'flex';
-                }, 4000); 
-
-                iframe.onload = function() {
-                    // Si carga bien, cancelamos la ayuda
-                    clearTimeout(loadTimer);
-                };
+                }, 5000); 
                 
                 // Resetear spinner
                 if(spinner) spinner.style.display = 'none';
@@ -242,7 +251,11 @@
 
         function cerrarRescate() {
             document.getElementById('rescue-screen').style.display = 'none';
-            clearTimeout(loadTimer);
+            // No limpiamos el timer aquí porque ya se ejecutó
+        }
+        
+        function abrirRescateManual() {
+            document.getElementById('rescue-screen').style.display = 'flex';
         }
 
         function resetear() {
@@ -250,6 +263,7 @@
             document.getElementById('main-frame').src = "";
             document.getElementById('app-wrapper').style.display = 'none';
             document.getElementById('btn-back').style.display = 'none';
+            document.getElementById('btn-help').style.display = 'none';
             document.getElementById('rescue-screen').style.display = 'none';
             document.getElementById('selector-screen').style.display = 'block';
             clearTimeout(loadTimer);
@@ -257,4 +271,5 @@
     </script>
 </body>
 </html>
+
 
