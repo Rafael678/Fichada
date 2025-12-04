@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Acceso Fichada</title>
-    <!-- Fuente Poppins para coincidir con la App -->
+    <!-- Fuente Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -14,7 +14,6 @@
             margin: 0; padding: 0; height: 100%; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             overflow: hidden;
-            /* Fondo degradado animado igual que la App */
             background: linear-gradient(135deg, #021b36, #003b5b, #046faa);
             background-size: 300% 300%;
             animation: gradientShift 10s ease infinite;
@@ -26,8 +25,8 @@
             100% { background-position: 0% 50%; }
         }
         
-        /* --- TARJETA DE SELECCIÓN --- */
-        #selector-screen {
+        /* --- PANTALLA INICIAL --- */
+        #start-screen {
             text-align: center;
             background: rgba(255, 255, 255, 0.95);
             padding: 40px 30px;
@@ -37,237 +36,188 @@
             max-width: 400px;
             z-index: 20;
             backdrop-filter: blur(10px);
+            transition: opacity 0.3s;
         }
 
-        h2 { 
-            margin: 0 0 5px 0; 
-            color: #003b5b; 
-            font-size: 1.5em; 
-            font-weight: 600; 
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 25px;
-        }
-        
-        .instruction-text {
-            color: #555;
-            font-size: 12px;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            line-height: 1.4;
-        }
+        h2 { margin: 0 0 10px 0; color: #003b5b; font-size: 1.6em; font-weight: 600; }
+        .subtitle { color: #666; font-size: 0.9em; margin-bottom: 30px; }
 
-        .btn-account {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 12px 0;
-            border: none;
-            border-radius: 12px;
-            background: #046faa; /* Azul corporativo */
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(4,111,170,0.3);
-            position: relative;
+        /* Botón Principal Grande */
+        .btn-main {
+            display: block; width: 100%; padding: 18px;
+            border: none; border-radius: 50px;
+            background: #046faa; color: white;
+            font-size: 18px; font-weight: 600;
+            cursor: pointer; transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 6px 15px rgba(4,111,170,0.4);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        
-        .btn-account:hover { 
-            transform: translateY(-2px);
-            background: #035a8a;
-        }
-        
-        .btn-account:active { 
-            transform: scale(0.98); 
-        }
+        .btn-main:hover { transform: translateY(-3px); background: #035a8a; }
+        .btn-main:active { transform: scale(0.97); }
 
-        /* --- CONTENEDOR DE LA APP (IFRAME) --- */
+        /* --- CONTENEDOR APP --- */
         #app-wrapper {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; /* Oculto al inicio */
-            background: white;
-            z-index: 10;
+            display: none; background: white; z-index: 10;
         }
-        
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Botón flotante para volver atrás (Izquierda) */
-        #btn-back {
-            position: fixed; bottom: 20px; left: 20px;
-            background: rgba(2, 27, 54, 0.8); 
-            color: white;
-            border: none; border-radius: 50%; width: 50px; height: 50px;
-            font-size: 24px; cursor: pointer; z-index: 30;
-            display: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-        #btn-back:active { transform: scale(0.9); }
-
-        /* Botón flotante de AYUDA (Derecha) - NUEVO */
-        #btn-help {
-            position: fixed; bottom: 20px; right: 20px;
-            background: #d32f2f; 
-            color: white;
-            border: none; border-radius: 50%; width: 50px; height: 50px;
-            font-size: 24px; cursor: pointer; z-index: 30;
-            display: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-weight: bold;
-        }
-
-        /* Spinner simple */
-        .spinner {
-            display: inline-block; width: 12px; height: 12px;
-            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
-            border-top-color: white; animation: spin 1s ease-in-out infinite;
-            margin-left: 10px; display: none;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- PANTALLA DE RESCATE (Nuevo) --- */
-        /* Aparece si se detecta bloqueo de carga */
+        /* --- PANTALLA DE RESCATE (MODIFICADA) --- */
         #rescue-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.98); /* Fondo blanco casi sólido */
-            z-index: 40; /* Por encima de todo */
+            background: rgba(255,255,255,0.98);
+            z-index: 30;
             display: none; /* Oculto por defecto */
             flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 20px;
+            text-align: center; padding: 25px;
         }
-        .btn-rescue {
-            background: #d32f2f; /* Rojo alerta */
-            color: white; padding: 15px 30px;
-            border-radius: 30px; text-decoration: none;
-            font-weight: bold; font-size: 16px;
-            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
-            margin-top: 20px;
-            display: inline-block;
-            transition: transform 0.2s;
+
+        .rescue-title { color: #d32f2f; font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
+        .rescue-desc { color: #555; font-size: 14px; margin-bottom: 25px; max-width: 300px; line-height: 1.5; }
+
+        /* Botones de Rescate */
+        .btn-rescue-option {
+            width: 100%; max-width: 300px; padding: 14px; margin: 8px 0;
+            border-radius: 12px; border: 1px solid #ddd;
+            font-size: 15px; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s;
         }
-        .btn-rescue:active { transform: scale(0.95); }
+        
+        /* Estilos específicos de botones */
+        .btn-google { background: white; color: #444; border-color: #ccc; }
+        .btn-next { background: #046faa; color: white; border: none; box-shadow: 0 4px 10px rgba(4,111,170,0.3); }
+        .btn-cancel { background: transparent; border: none; color: #777; text-decoration: underline; margin-top: 15px; }
+
+        /* Spinner */
+        .spinner {
+            width: 16px; height: 16px; border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: white;
+            animation: spin 1s linear infinite; display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-    <!-- PANTALLA 1: SELECCIÓN -->
-    <div id="selector-screen">
-        <div style="font-size: 40px; margin-bottom: 10px;">📍</div>
+    <!-- PANTALLA 1: INICIO -->
+    <div id="start-screen">
+        <div style="font-size: 45px; margin-bottom: 10px;">📍</div>
         <h2>Bienvenido</h2>
         <div class="subtitle">LC. Service Oil & Gas</div>
         
-        <button class="btn-account" onclick="cargarConCuenta(0, this)">
-            Opción 1 <span class="spinner"></span>
-        </button>
-        <button class="btn-account" onclick="cargarConCuenta(1, this)">
-            Opción 2 <span class="spinner"></span>
-        </button>
-        <button class="btn-account" onclick="cargarConCuenta(2, this)">
-            Opción 3 <span class="spinner"></span>
+        <button class="btn-main" onclick="iniciarSecuencia()">
+            REALIZAR REGISTRO <span class="spinner" id="main-spinner"></span>
         </button>
         
-        <p class="instruction-text">
-            En caso de no poder ingresar en una de esas opciones, intente ingresar por las otras.
+        <p style="font-size: 12px; color: #888; margin-top: 25px;">
+            Pulse para ingresar automáticamente.
         </p>
     </div>
 
     <!-- PANTALLA 2: APP -->
     <div id="app-wrapper">
-        <iframe 
-            id="main-frame"
-            src="" 
-            allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; fullscreen *"
-            title="App Fichada">
-        </iframe>
+        <iframe id="main-frame" src="" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; fullscreen *" title="App Fichada"></iframe>
     </div>
 
-    <!-- PANTALLA DE RESCATE (Para móviles cuando se tilda) -->
+    <!-- PANTALLA DE RESCATE (DINÁMICA) -->
     <div id="rescue-screen">
-        <h3 style="color:#003b5b; margin-bottom:10px;">¿Problemas de acceso?</h3>
-        <p style="color:#666; font-size:14px; line-height:1.5;">
-            Si la pantalla está en blanco o con error,<br>use el selector oficial de Google.
-        </p>
-        <a id="rescue-link" href="#" target="_blank" class="btn-rescue">
-            🚀 ELEGIR CUENTA EN GOOGLE
+        <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+        <div class="rescue-title">¿Problemas de conexión?</div>
+        <p class="rescue-desc">Si la pantalla se quedó en blanco o dio error, elija una opción:</p>
+        
+        <!-- Opción A: Google Oficial (Siempre disponible) -->
+        <a id="btn-google-auth" href="#" target="_blank" class="btn-rescue-option btn-google" style="text-decoration:none;">
+            🚀 Elegir Cuenta en Google
         </a>
-        <br><br>
-        <button onclick="cerrarRescate()" style="background:none; border:none; color:#666; text-decoration:underline; cursor:pointer; font-size:14px;">Cancelar (Ya cargó bien)</button>
-    </div>
 
-    <!-- Botones flotantes -->
-    <button id="btn-back" onclick="resetear()">↺</button>
-    <button id="btn-help" onclick="abrirRescateManual()">?</button>
+        <!-- Opción B: Siguiente Alternativa (Dinámico) -->
+        <button id="btn-next-attempt" class="btn-rescue-option btn-next" onclick="probarSiguiente()">
+            🔄 Probar Alternativa 2
+        </button>
+
+        <!-- Opción C: Cancelar -->
+        <button class="btn-cancel" onclick="cerrarRescate()">Cancelar (Ya cargó bien)</button>
+    </div>
 
     <script>
-        // ENLACE ACTUALIZADO
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbzfACA37EawNLAuOGGtHd2R0Uki-Z1ze-AURg18yrU-m9uDBU_blGR67CoiCsUseeE/exec";
+        // Enlace de tu Backend (NUEVO LINK)
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbxsZ87d_uS-O6SZQELSiv96OVAA9uIWCD29Ujtuc2dYGlGWjios7Pygdo2bu6RExog/exec";
+        
+        let currentAuthIndex = 0; // Empieza en Opción 1 (Usuario 0)
         let loadTimer;
 
-        function cargarConCuenta(authIndex, btnElement) {
-            // Mostrar carga visual
-            const spinner = btnElement.querySelector('.spinner');
-            if(spinner) spinner.style.display = 'inline-block';
+        // URL del selector oficial de Google (para el botón de ayuda)
+        const accountChooserUrl = "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent(scriptUrl);
+        document.getElementById('btn-google-auth').href = accountChooserUrl;
 
+        function iniciarSecuencia() {
+            // Mostrar carga
+            const spinner = document.getElementById('main-spinner');
+            spinner.style.display = 'inline-block';
+            
+            // Iniciar intento 0 (Opción 1)
             setTimeout(() => {
-                // Ocultar selector / Mostrar iframe
-                document.getElementById('selector-screen').style.display = 'none';
-                document.getElementById('app-wrapper').style.display = 'block';
-                document.getElementById('btn-back').style.display = 'block';
-                document.getElementById('btn-help').style.display = 'block';
-
-                // Construir URL forzando el usuario (0, 1 o 2) + Anti-Caché
-                const cacheBuster = new Date().getTime();
-                const finalUrl = scriptUrl + "?authuser=" + authIndex + "&v=" + cacheBuster;
-
-                // URL de Rescate: Selector Oficial de Google
-                // Esto fuerza a Google a mostrar la lista de cuentas en una pestaña nueva
-                const accountChooserUrl = "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent(scriptUrl);
-
-                // Configurar enlace de rescate por si acaso
-                document.getElementById('rescue-link').href = accountChooserUrl;
-
-                // Cargar
-                const iframe = document.getElementById('main-frame');
-                iframe.src = finalUrl;
-                
-                // --- DETECTOR DE CONGELAMIENTO MEJORADO ---
-                // No cancelamos el timer con onload porque a veces onload dispara el error.
-                // Mostramos la ayuda a los 5 segundos SIEMPRE. Si cargó bien, el usuario la cierra.
-                loadTimer = setTimeout(() => {
-                    document.getElementById('rescue-screen').style.display = 'flex';
-                }, 5000); 
-                
-                // Resetear spinner
-                if(spinner) spinner.style.display = 'none';
+                intentarCarga(0);
+                spinner.style.display = 'none';
             }, 300);
+        }
+
+        function intentarCarga(index) {
+            currentAuthIndex = index;
+            
+            // Ocultar inicio / Mostrar App
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('rescue-screen').style.display = 'none'; // Ocultar rescate anterior si lo hubiera
+            document.getElementById('app-wrapper').style.display = 'block';
+
+            // URL Mágica
+            const cacheBuster = new Date().getTime();
+            const finalUrl = scriptUrl + "?authuser=" + index + "&v=" + cacheBuster;
+
+            const iframe = document.getElementById('main-frame');
+            iframe.src = finalUrl;
+
+            // ACTIVAR TEMPORIZADOR DE FALLO (5 segundos)
+            // Si en 5s el usuario no ha cerrado esto, asumimos que se colgó
+            if (loadTimer) clearTimeout(loadTimer);
+            
+            loadTimer = setTimeout(() => {
+                mostrarRescate();
+            }, 5000);
+
+            // Si el iframe carga, no cancelamos el timer automáticamente
+            // porque el error de Google a veces dispara el evento "load".
+            // Dejamos que el usuario decida si ve bien la app.
+        }
+
+        function mostrarRescate() {
+            const nextIndex = currentAuthIndex + 1;
+            const btnNext = document.getElementById('btn-next-attempt');
+
+            // Configurar el botón de "Siguiente Alternativa"
+            if (nextIndex <= 2) { // Si hay más opciones (1 o 2)
+                btnNext.style.display = 'flex';
+                btnNext.innerHTML = `🔄 Probar Alternativa ${nextIndex + 1}`; // Texto humano (2 o 3)
+            } else {
+                // Si ya probamos todas (0, 1 y 2), ocultamos este botón
+                btnNext.style.display = 'none';
+            }
+
+            document.getElementById('rescue-screen').style.display = 'flex';
+        }
+
+        function probarSiguiente() {
+            // Intentar con el siguiente índice
+            intentarCarga(currentAuthIndex + 1);
         }
 
         function cerrarRescate() {
             document.getElementById('rescue-screen').style.display = 'none';
-            // No limpiamos el timer aquí porque ya se ejecutó
-        }
-        
-        function abrirRescateManual() {
-            document.getElementById('rescue-screen').style.display = 'flex';
+            if (loadTimer) clearTimeout(loadTimer);
         }
 
-        function resetear() {
-            // Volver al inicio
-            document.getElementById('main-frame').src = "";
-            document.getElementById('app-wrapper').style.display = 'none';
-            document.getElementById('btn-back').style.display = 'none';
-            document.getElementById('btn-help').style.display = 'none';
-            document.getElementById('rescue-screen').style.display = 'none';
-            document.getElementById('selector-screen').style.display = 'block';
-            clearTimeout(loadTimer);
-        }
     </script>
 </body>
 </html>
